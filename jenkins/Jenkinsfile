@@ -1,12 +1,27 @@
 pipeline {
     agent any 
 
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['DEV','PROD'])
+        booleanParam(name: 'Skip_Tests', defaultValue: false)
+    }
+
     tools {
         maven 'maven3'
     }
 
     stages {
+
+        stage('Info') {
+            steps {
+                echo "Building for ${ params.ENVIRONMENT }"
+            }
+        }
+
         stage('Test') {
+            when {
+                expression {params.Skip_Tests == false}
+            }
             steps {
                 bat 'mvn -B test'
             }
