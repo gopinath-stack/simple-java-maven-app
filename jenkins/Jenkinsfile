@@ -1,1 +1,35 @@
-~
+pipeline {
+    agent any 
+
+    tools {
+        maven 'maven3'
+    }
+
+    stages {
+        stage('Test') {
+            steps {
+                bat 'mvn -B test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                bat 'mvn -B package -DskipTests'
+            }
+        }
+    }
+
+    post {
+        always {
+            junit 'target/surefire-reports/*.xml'
+        }
+
+        success {
+            archiveArtifacts 'target/*.jar'
+        }
+
+        cleanup {
+            cleanWs()
+        }
+    }
+}
